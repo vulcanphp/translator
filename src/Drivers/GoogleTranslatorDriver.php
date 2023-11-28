@@ -9,16 +9,17 @@ use VulcanPhp\Translator\Interfaces\ITranslatorManager;
 
 class GoogleTranslatorDriver implements ITranslatorDriver
 {
-    protected ITranslatorEngine $engine;
-    protected ITranslatorManager $manager;
+    protected ITranslatorEngine $Engine;
+    protected ITranslatorManager $Manager;
 
     protected array $lazyText = [];
     protected bool $isLazy = false, $changedLocal = false;
 
-    public function __construct(ITranslatorManager $manager)
+    public function __construct(ITranslatorManager $Manager)
     {
-        $this->manager  = $manager;
-        $this->engine   = new GoogleTranslator;
+        $this->setEngine(new GoogleTranslator);
+
+        $this->setManager($Manager);
     }
 
     public function translate($text = ''): ?string
@@ -164,13 +165,23 @@ class GoogleTranslatorDriver implements ITranslatorDriver
         }
     }
 
+    public function setEngine(ITranslatorEngine $Engine): void
+    {
+        $this->Engine = $Engine;
+    }
+
     public function getEngine(): ITranslatorEngine
     {
-        return $this->engine;
+        return $this->Engine;
+    }
+
+    public function setManager(ITranslatorManager $Manager): void
+    {
+        $this->Manager = $Manager;
     }
 
     public function getManager(): ITranslatorManager
     {
-        return $this->manager;
+        return $this->Manager;
     }
 }
