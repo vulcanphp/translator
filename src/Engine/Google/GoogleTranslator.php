@@ -57,6 +57,24 @@ class GoogleTranslator implements ITranslatorEngine
             return [];
         }
 
+        $translated = [];
+
+        foreach ($this->translateFromGoogle($translate, $source, $convert)[0] as $sentence) {
+            $translated[] = isset($sentence[0]) ? ' ' . $sentence[0] : '';
+        }
+
+        $translated = array_filter(
+            array_map(
+                fn ($sentence) => trim(str_ireplace("\n", '', $sentence)),
+                explode($separator, str_ireplace($replace, $separator, join('', $translated)))
+            )
+        );
+
+        return count($texts) === count($translated) ? array_filter(array_combine($texts, $translated)) : [];
+    }
+
+    public function translateFromGoogle(string $translate, string $source, string $convert): array
+    {
         try {
             $queryArray = $this->queryParams([
                 'sl' => $source,
@@ -96,20 +114,7 @@ class GoogleTranslator implements ITranslatorEngine
             throw new TranslatorException('Data cannot be decoded or it is deeper than the recursion limit');
         }
 
-        $translated = [];
-
-        foreach ($sentencesArray[0] as $sentence) {
-            $translated[] = isset($sentence[0]) ? ' ' . $sentence[0] : '';
-        }
-
-        $translated = array_filter(
-            array_map(
-                fn ($sentence) => trim(str_ireplace("\n", '', $sentence)),
-                explode($separator, str_ireplace($replace, $separator, join('', $translated)))
-            )
-        );
-
-        return count($texts) === count($translated) ? array_filter(array_combine($texts, $translated)) : [];
+        return $sentencesArray;
     }
 
     protected function queryParams(array $params): array
